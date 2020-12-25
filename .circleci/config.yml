@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  aws-cli: circleci/aws-cli@1.3.1
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -40,12 +43,14 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
+      - aws-cli/setup:
+          profile-name: ASAWS
       - run:
           name: Build front-end
           command: |
             # Your code here
             aws cloudformation deploy \
-              --template-file frontend.yml \
+              --template-file files/frontend.yml \
               --stack-name frontend-${CIRCLE_WORKFLOW_ID}
             exit 1
       - save_cache:
@@ -59,12 +64,14 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
+      - aws-cli/setup:
+          profile-name: ASAWS
       - run:
           name: Back-end build
           command: |
              # Your code here
              aws cloudformation deploy \
-              --template-file backend.yml \
+              --template-file files/backend.yml \
               --stack-name backend-${CIRCLE_WORKFLOW_ID}
              exit 1
       - save_cache:
