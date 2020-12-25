@@ -49,7 +49,7 @@ jobs:
           name: Build front-end
           command: |
             # Your code here
-            aws cloudformation create \
+            aws cloudformation create-stack \
               --template-body /files/frontend.yml \
               --stack-name frontend-${CIRCLE_WORKFLOW_ID} \
               --region=us-west-2 \
