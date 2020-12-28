@@ -48,12 +48,6 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
-            # aws cloudformation deploy \
-            #   --template-file .circleci/files/frontend.yml \
-            #   --stack-name frontend-${CIRCLE_WORKFLOW_ID} \
-            #   --parameter-overrides ID="id"
-            # exit 1
             cd frontend
             npm install
             npm run start
@@ -74,7 +68,7 @@ jobs:
           name: Back-end build
           command: |
             cd backend
-            # npm install
+            npm install
             npm run start
             # npm run build
       - save_cache:
