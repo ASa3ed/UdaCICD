@@ -71,11 +71,11 @@ jobs:
           key: backend-build
 
   test-frontend:
-        executor:
-            name: node/default
-        steps:
-            - checkout
-            -   run: cd frontend && npm i && npm run test
+    executor:
+        name: node/default
+    steps:
+        - checkout
+        -   run: cd frontend && npm i && npm run test
                 
   test-backend:
     docker:
