@@ -71,18 +71,12 @@ jobs:
           key: backend-build
 
   test-frontend:
-    docker:
-      - image: node/default
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: Front-end Test
-          command: |
-            cd frontend
-            npm install
-            npm run test
+    test-FE:
+        executor:
+            name: node/default
+        steps:
+            - checkout
+            -   run: cd frontend && npm i && npm run test
                 
   test-backend:
     docker:
