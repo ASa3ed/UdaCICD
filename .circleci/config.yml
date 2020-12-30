@@ -71,7 +71,6 @@ jobs:
           key: backend-build
 
   test-frontend:
-    test-FE:
         executor:
             name: node/default
         steps:
