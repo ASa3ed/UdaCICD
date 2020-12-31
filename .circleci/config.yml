@@ -159,7 +159,7 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:project,Values=udacity" \
               --output text >> .circleci/ansible/inventory.txt
-            cat inventory.txt
+            cat .circleci/ansible/inventory.txt
             ls ~/project/.circleci/ansible/
             cat ~/project/.circleci/ansible/inventory.txt
       - persist_to_workspace:
