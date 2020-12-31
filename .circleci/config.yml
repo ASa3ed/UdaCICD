@@ -134,11 +134,11 @@ jobs:
       - image: circleci/aws-cli
     steps:
       - checkout
+      - aws-cli/setup:
+                profile-name: ASAWS
       - run:
           name: Ensure back-end infrastructure exists
           command: |
-            - aws-cli/setup:
-                profile-name: ASAWS
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udacity \
@@ -148,8 +148,6 @@ jobs:
       - run:
           name: Ensure front-end infrastructure exist
           command: |
-            - aws-cli/setup:
-                profile-name: ASAWS
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udacity \
