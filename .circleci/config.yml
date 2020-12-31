@@ -173,6 +173,8 @@ jobs:
       - checkout
       - aws-cli/setup:
                 profile-name: ASAWS  
+      - attach_workspace:
+          at: ~/
       - run:
           name: check something
           command: |
