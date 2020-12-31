@@ -152,20 +152,26 @@ jobs:
       #         --tags project=udacity \
       #         --stack-name frontend-${CIRCLE_WORKFLOW_ID} \
       #         --parameter-overrides ID="id"  
+      # - run:
+      #     name: Add back-end ip to ansible inventory
+      #     command: |
+      #       aws ec2 describe-instances \
+      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
+      #         --filters "Name=tag:project,Values=udacity" \
+      #         --output text >> .circleci/ansible/inventory.txt
+      #       cat .circleci/ansible/inventory.txt
+      #       ls ~/project/.circleci/ansible/
+      #       cat ~/project/.circleci/ansible/inventory.txt
+      # - persist_to_workspace:
+      #     root: ~/
+      #     paths:
+      #       - project/.circleci/ansible/inventory.txt
       - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udacity" \
-              --output text >> .circleci/ansible/inventory.txt
+          name: check something
+          cmmand: |
             cat .circleci/ansible/inventory.txt
             ls ~/project/.circleci/ansible/
             cat ~/project/.circleci/ansible/inventory.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure      
 
   # configure-infrastructure:
