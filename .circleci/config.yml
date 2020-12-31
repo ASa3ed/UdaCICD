@@ -160,6 +160,8 @@ jobs:
               --filters "Name=tag:project,Values=udacity" \
               --output text >> inventory.txt
             cat inventory.txt
+            ls /
+            ls ~/
       - persist_to_workspace:
           root: ~/
           paths:
