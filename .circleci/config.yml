@@ -174,7 +174,7 @@ jobs:
       # - aws-cli/setup:
       #           profile-name: ASAWS  
       - attach_workspace:
-          at: ~/project/.circleci/ansible/
+          at: ~/project/.circleci/ansible/inventory.txt
       - run:
           name: check something
           command: |
