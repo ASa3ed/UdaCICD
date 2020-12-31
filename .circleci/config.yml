@@ -170,7 +170,7 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      # - checkout
+      - checkout
       # - aws-cli/setup:
       #           profile-name: ASAWS  
       - attach_workspace:
