@@ -161,6 +161,7 @@ jobs:
               --output text >> .circleci/ansible/inventory.txt
       - run:
           name: Dependencies
+          command: |
             cat .circleci/ansible/inventory.txt
             ls ~/project/.circleci/ansible/
             cat ~/project/.circleci/ansible/inventory.txt
