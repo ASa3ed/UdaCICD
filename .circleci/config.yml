@@ -199,8 +199,15 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            apk add --no-cache \
+                python3 \
+                py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install \
+                awscli \
+            && rm -rf /var/cache/apk/*
             apk add --update ansible
-            apk add aws-cli
+            
       - run:
           name: Configure server
           command: |
