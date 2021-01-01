@@ -166,8 +166,9 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment
+      
+      - destroy-environment # Here's where you will add some code to rollback on failure
+
 
   # check:
   #   docker:
@@ -201,8 +202,9 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i inventory.txt configure-server.yml
-      # Here's where you will add some code to rollback on failure      
+            ansible-playbook -i inventory.txt .circleci/ansible/configure-server.yml
+      
+      - destroy-environment # Here's where you will add some code to rollback on failure
 
   # run-migrations:
   #   docker:
