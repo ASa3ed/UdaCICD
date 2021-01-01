@@ -167,24 +167,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       
-      - destroy-environment # Here's where you will add some code to rollback on failure
-
-
-  # check:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/project/.circleci/ansible/
-  #     - run:
-  #         name: check something
-  #         command: |
-  #           cat .circleci/ansible/inventory.txt
-  #           ls ~/project/.circleci/ansible/
-  #           cat ~/project/.circleci/ansible/inventory.txt
-       
-
+      - destroy-environment # Rollback on failure
 
   configure-infrastructure:
     docker:
@@ -194,7 +177,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ed:e9:83:cf:43:79:b8:a7:92:3b:e6:66:18:06:61:83"]
       - attach_workspace:
-          at: ~/project/.circleci/ansible/
+          at: /tmp/project/.circleci/ansible/
       - run:
           name: Install dependencies
           command: |
@@ -210,9 +193,9 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i /tmp/project/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
-      - destroy-environment # Here's where you will add some code to rollback on failure
+      - destroy-environment # Rollback on failure
 
   # run-migrations:
   #   docker:
@@ -340,13 +323,13 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch] 
-      - configure-infrastructure
-          # requires: [deploy-infrastructure]
+      - deploy-infrastructure:
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch] 
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
