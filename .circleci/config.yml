@@ -165,7 +165,7 @@ jobs:
             cat .circleci/ansible/inventory.txt
             ls ~/project/.circleci/ansible/
             cat ~/project/.circleci/ansible/inventory.txt
-            apt install tar
+            yum -y install tar
       - persist_to_workspace:
           root: ~/
           paths:
