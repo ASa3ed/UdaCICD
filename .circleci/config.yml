@@ -177,7 +177,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ed:e9:83:cf:43:79:b8:a7:92:3b:e6:66:18:06:61:83"]
       - attach_workspace:
-          at: /tmp/
+          at: /tmp/.circleci/ansible
       - run:
           name: Install dependencies
           command: |
@@ -193,7 +193,7 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
       - destroy-environment # Rollback on failure
 
