@@ -163,7 +163,7 @@ jobs:
             cat ~/project/.circleci/ansible/inventory.txt
             yum -y install tar gzip jq npm
       - persist_to_workspace:
-          root: ansible
+          root: .circleci/ansible
           paths:
             - .circleci/ansible/inventory.txt
       
@@ -177,7 +177,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ed:e9:83:cf:43:79:b8:a7:92:3b:e6:66:18:06:61:83"]
       - attach_workspace:
-          at: /tmp/ansible
+          at: /tmp/.circleci/ansible
       - run:
           name: Install dependencies
           command: |
