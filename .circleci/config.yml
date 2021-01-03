@@ -163,9 +163,9 @@ jobs:
             cat ~/project/.circleci/ansible/inventory.txt
             yum -y install tar gzip jq npm
       - persist_to_workspace:
-          root: /
+          root: ansible
           paths:
-            - .circleci/ansible/inventory.txt
+            - inventory.txt
       
       - destroy-environment # Rollback on failure
 
