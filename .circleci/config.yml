@@ -219,10 +219,10 @@ jobs:
             npm run build
             npm audit fix --force
 
-            cat .env
+            # cat .env
             
-            echo 'DUMP MIGRATIONS'
-            echo 'hello world!!' > migrations_dump.txt
+            # echo 'DUMP MIGRATIONS'
+            # echo 'hello world!!' > migrations_dump.txt
             npm run migrations >> migrations_dump.txt
             echo "I AM HERE!!" 
             pwd
