@@ -202,8 +202,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
       - run:
           name: awscli install
           command: |
@@ -214,36 +212,25 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install 
-            npm audit fix --force
+            npm install
             npm run build
-            npm audit fix --force
 
-            # cat .env
-            
-            # echo 'DUMP MIGRATIONS'
-            # echo 'hello world!!' > migrations_dump.txt
-            npm run migrations >> migrations_dump.txt
-            echo "I AM HERE!!" 
-            pwd
-            ls -la
-            
-            echo 'DISPLAY CONTENTS'
-            cat migrations_dump.txt
-            echo '*****************'
-
+            touch migration.txt
+            npm run migrations >> migration.txt
+            cat migration.txt
+           
       - run:
           name: Send migration results to memstash
           command: |
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            if grep -q "has been executed successfully." migration.txt
             then
-              curl -H "Content-Type: text/plain" -H "token: cec89a7b-efb7-4073-a329-074f88fea64c" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-              echo migration_${CIRCLE_WORKFLOW_ID}
-              echo "1"
+            curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" \
+            --request PUT \
+            --data "1" https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID}
             else
-              curl -H "Content-Type: text/plain" -H "token: cec89a7b-efb7-4073-a329-074f88fea64c" --request PUT --data "0" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-              echo migration_${CIRCLE_WORKFLOW_ID}
-              echo "0"
+            curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" \
+            --request PUT \
+            --data "0" https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID}
             fi
       
       # - destroy-environment # Rollback on failure      
@@ -357,15 +344,15 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch] 
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      - run-migrations
-          # requires: [configure-infrastructure]
+      - deploy-infrastructure:
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch] 
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
