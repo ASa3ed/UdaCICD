@@ -293,8 +293,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["ed:e9:83:cf:43:79:b8:a7:92:3b:e6:66:18:06:61:83"]
-      # - attach_workspace:
-      #     at: /tmp/.circleci/ansible
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
       - run: 
           name: workaround
           command: |
