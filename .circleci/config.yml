@@ -214,8 +214,10 @@ jobs:
           name: Run migrations
           command: |
             cd backend && npm install 
-            npm run build
             npm audit fix --force
+            npm audit --force
+            npm run build
+            
 
             cat .env
             
