@@ -172,6 +172,7 @@ jobs:
           paths:
             - inventory.txt
       
+      - revert-migrations
       - destroy-environment # Rollback on failure
 
   configure-infrastructure:
@@ -200,6 +201,7 @@ jobs:
           command: |
             ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
+      - revert-migrations
       - destroy-environment # Rollback on failure
 
   run-migrations:
@@ -249,6 +251,7 @@ jobs:
             ls -la
             cat backend/migration.txt
 
+      - revert-migrations
       - destroy-environment # Rollback on failure      
      
   deploy-frontend:
@@ -260,8 +263,8 @@ jobs:
           name: Install dependencies
           command: |
             yum -y install tar gzip nodejs
-            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            
+            # curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            yum -y install npm
       - run:
           name: Get backend url
           command: |
@@ -274,11 +277,12 @@ jobs:
           name: Deploy frontend objects
           command: |
             npm install webpack-dev-server -g
-            cd ./frontend
+            cd frontend
             npm install
             npm run build
             aws s3 cp ./dist s3://udapeople-id --recursive
 
+      - revert-migrations
       - destroy-environment # Rollback on failure      
                     
   deploy-backend:
@@ -301,6 +305,7 @@ jobs:
           command: |
             ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
 
+      - revert-migrations
       - destroy-environment # Rollback on failure  
 
   # smoke-test:
@@ -325,6 +330,7 @@ jobs:
   #         command: |
   #           # your code here
   # 
+  #     - revert-migrations
   #     - destroy-environment # Rollback on failure  
 
   # cloudfront-update:
@@ -375,19 +381,19 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      - deploy-infrastructure:
-          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [test-feature-branch] 
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
+      # - deploy-infrastructure:
+      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch] 
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      - deploy-frontend
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
