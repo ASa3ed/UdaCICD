@@ -5,9 +5,7 @@ orbs:
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    # parameters:
-      # Add parameter here   
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
     steps:
       - run:
           name: Destroy environments
@@ -15,24 +13,23 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID}
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID}
-            
+            aws s3 rm s3://udapeople-id --recursive
+            aws s3 rb s3://udapeople-id --force
+
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    # parameters:
-      # Add parameter here     
+    description: Revert the last migration if successfully run in the current workflow.   
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run
+          when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" \
+            --request GET https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID})
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+             cd backend
+             npm install
+             npm run migrations:revert
             fi
             
 jobs:
@@ -151,10 +148,18 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances \
+            ip = $(aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:project,Values=udacity" \
-              --output text >> .circleci/ansible/inventory.txt
+              --output text) 
+            
+            echo "$ip" >> .circleci/ansible/inventory.txt
+            echo "$ip"
+
+            curl -H "Content-Type: text/plain" -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+            --request PUT \
+            --data "$ip" https://api.memstash.io/values/IP
+
       - run:
           name: Dependencies
           command: |
@@ -213,11 +218,9 @@ jobs:
           command: |
             cd backend
             npm install
-            echo "____________________________________Step Ended _________________________________"
             npm run build
-            echo "____________________________________Step Ended _________________________________"
             # npm audit fix --audit-level=critical --force
-            # echo "____________________________________Step Ended _________________________________"
+            # echo "_________________ Step Ended ___________________"
 
             touch migration.txt
             npm run migrations >> migration.txt
@@ -246,45 +249,59 @@ jobs:
             ls -la
             cat backend/migration.txt
 
-      # - destroy-environment # Rollback on failure      
+      - destroy-environment # Rollback on failure      
      
-  # deploy-frontend:
-  #   docker:
-  #     # Docker image here that supports AWS CLI
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "${API_URL}"
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure      
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip nodejs
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP = $(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+                          --request GET https://api.memstash.io/values/IP)
+
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            npm install webpack-dev-server -g
+            cd ./frontend
+            npm install
+            npm run build
+            aws s3 cp ./dist s3://udapeople-id --recursive
+
+      - destroy-environment # Rollback on failure      
                     
-  # deploy-backend:
-  #   docker:
-  #     # Docker image here that supports Ansible
-  #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Deploy backend
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["ed:e9:83:cf:43:79:b8:a7:92:3b:e6:66:18:06:61:83"]
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible tar
+            apk add --update tar gzip curl
+            apk add --update openssh-client
+      - run:
+          name: Deploy backend
+          command: |
+            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+
+      - destroy-environment # Rollback on failure  
 
   # smoke-test:
   #   docker:
@@ -307,7 +324,8 @@ jobs:
   #         name: Frontend smoke test.
   #         command: |
   #           # your code here
-  #     # Here's where you will add some code to rollback on failure  
+  # 
+  #     - destroy-environment # Rollback on failure  
 
   # cloudfront-update:
   #   docker:
@@ -357,19 +375,19 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch] 
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - deploy-infrastructure:
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch] 
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       - run-migrations
-          # requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
