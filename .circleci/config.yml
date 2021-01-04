@@ -25,6 +25,7 @@ commands:
           command: |
             SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID}" \
             --request GET https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID})
+            echo "************** SUCCESS = $SUCCESS"
             if(( $SUCCESS==1 )); 
             then
              cd backend
@@ -262,9 +263,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum -y install tar gzip nodejs
-            # curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
-            yum -y install npm
+            yum -y install tar gzip 
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+            # yum -y install nodejs
       - run:
           name: Get backend url
           command: |
@@ -297,7 +298,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible tar
+            apk add --update ansible
             apk add --update tar gzip curl
             apk add --update openssh-client
       - run:
