@@ -216,8 +216,8 @@ jobs:
             echo "____________________________________Step Ended _________________________________"
             npm run build
             echo "____________________________________Step Ended _________________________________"
-            npm audit fix --audit-level=critical --force
-            echo "____________________________________Step Ended _________________________________"
+            # npm audit fix --audit-level=critical --force
+            # echo "____________________________________Step Ended _________________________________"
 
 
             touch migration.txt
@@ -242,6 +242,7 @@ jobs:
           when: on_fail
           command: |
             cat /home/circleci/.npm/_logs/*-debug.log
+            cat migration.txt
 
       # - destroy-environment # Rollback on failure      
      
