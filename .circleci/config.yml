@@ -197,23 +197,55 @@ jobs:
       
       - destroy-environment # Rollback on failure
 
-  # run-migrations:
-  #   docker:
-  #     # Docker image here that supports NodeJS
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Run migrations
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #     - run:
-  #         name: Send migration results to memstash
-  #         command: |
-  #           # Your code here
-  #           exit 1
-  #    # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: awscli install
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get -qq install awscli
+            sudo apt-get -y -qq install python3
+      - run:
+          name: Run migrations
+          command: |
+            cd backend && npm install 
+            npm run build
+            npm audit fix --force
 
+            cat .env
+            
+            echo 'DUMP MIGRATIONS'
+            echo 'hello world!!' > migrations_dump.txt
+            npm run migrations >> migrations_dump.txt
+            echo "I AM HERE!!" 
+            pwd
+            ls -la
+            
+            echo 'DISPLAY CONTENTS'
+            cat migrations_dump.txt
+            echo '*****************'
+
+      - run:
+          name: Send migration results to memstash
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              curl -H "Content-Type: text/plain" -H "token: cec89a7b-efb7-4073-a329-074f88fea64c" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+              echo migration_${CIRCLE_WORKFLOW_ID}
+              echo "1"
+            else
+              curl -H "Content-Type: text/plain" -H "token: cec89a7b-efb7-4073-a329-074f88fea64c" --request PUT --data "0" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
+              echo migration_${CIRCLE_WORKFLOW_ID}
+              echo "0"
+            fi
+      
+      - destroy-environment # Rollback on failure      
+     
   # deploy-frontend:
   #   docker:
   #     # Docker image here that supports AWS CLI
@@ -330,8 +362,8 @@ workflows:
               only: [test-feature-branch] 
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
