@@ -213,7 +213,12 @@ jobs:
           command: |
             cd backend
             npm install
+            echo "____________________________________Step Ended _________________________________"
             npm run build
+            echo "____________________________________Step Ended _________________________________"
+            npm audit fix --audit-level=critical --force
+            echo "____________________________________Step Ended _________________________________"
+
 
             touch migration.txt
             npm run migrations >> migration.txt
@@ -232,7 +237,12 @@ jobs:
             --request PUT \
             --data "0" https://api.memstash.io/values/migration-${CIRCLE_WORKFLOW_ID}
             fi
-      
+      - run:
+          name: LogOnFail
+          when: on_fail
+          command: |
+            cat /home/circleci/.npm/_logs/*-debug.log
+
       # - destroy-environment # Rollback on failure      
      
   # deploy-frontend:
@@ -344,15 +354,15 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      - deploy-infrastructure:
-          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [test-feature-branch] 
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
+      # - deploy-infrastructure:
+      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [test-feature-branch] 
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      - run-migrations
+          # requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
       # - deploy-backend:
