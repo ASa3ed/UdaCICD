@@ -148,7 +148,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            $ip = $(aws ec2 describe-instances \
+            ip=$(aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:project,Values=udacity" \
               --output text) 
@@ -265,8 +265,8 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP = $(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
-                          --request GET https://api.memstash.io/values/IP)
+            BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+                        --request GET https://api.memstash.io/values/IP)
 
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
