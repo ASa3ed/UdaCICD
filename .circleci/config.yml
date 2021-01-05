@@ -308,6 +308,11 @@ jobs:
             apk add --update tar gzip curl
             apk add --update openssh-client
       - run:
+          name: Compress Backend
+          command: |
+            tar -C backend -czvf artifact.tar.gz .
+            ls -la
+      - run:
           name: Deploy backend
           command: |
             ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml

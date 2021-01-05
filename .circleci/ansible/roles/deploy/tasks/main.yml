@@ -14,25 +14,21 @@
     production: yes
     state: present
 
-# - name: Copy backend dist files web server
-#   copy:
-#     src: /root/project/backend
-#     dest: /home/ubuntu
+- name: Copy backend dist files web server
+  copy:
+    src: /root/project/artifact.tar.gz
+    dest: /home/ubuntu/backend
 
-- name: Ensure Copying Done
+- name: Uncompress Backend
   shell: |
     cd /home/ubuntu/backend
-    tree
+    tar xvzf artifact.tar.gz -C backend
     ls -la
-
-- name: Install Node
+    
+- name: Build
   shell: |
     cd /home/ubuntu/backend
     npm install
-
-- name: Build Node
-  shell: |
-    cd /home/ubuntu/backend
     npm run build
 
 - name: Start PM2
