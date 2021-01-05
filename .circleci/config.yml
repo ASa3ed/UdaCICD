@@ -334,22 +334,13 @@ jobs:
           command: |
             BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
                         --request GET https://api.memstash.io/values/IP)
-            URL="http://54.213.101.189:3030/api/status"
+            URL="http://$BACKEND_IP:3030/api/status"
             echo $URL
             curl $URL
-      # - run:
-      #     name: Backend smoke test.
-      #     command: |
-      #       echo "---------------"
-      #       echo $BACKEND_IP
-      #       echo "---------------"
-      #       URL="http://$BACKEND_IP:3030/api/status"
-      #       echo $URL
-      #       curl -s $URL
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-id.s3-website-us-west-2.amazonaws.com"
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-west-2.amazonaws.com"
             if curl -s ${URL} | grep "Welcome"
             then
               return 1
@@ -408,21 +399,21 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch] 
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      - smoke-test
-          # requires: [deploy-backend, deploy-frontend]
+      - deploy-infrastructure:
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch] 
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
