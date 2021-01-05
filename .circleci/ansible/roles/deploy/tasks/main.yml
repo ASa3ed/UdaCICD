@@ -14,14 +14,18 @@
     production: yes
     state: present
 
+- name: Creates directory
+  file:
+    path: /home/ubuntu/backend
+    state: directory
+
 - name: Copy backend dist files web server
   copy:
     src: /root/project/artifact.tar.gz
-    dest: /home/ubuntu/artifact.tar.gz
+    dest: /home/ubuntu/backend/artifact.tar.gz
 
 - name: Uncompress Backend
   shell: |
-    mkdir /home/ubuntu/backend
     cd /home/ubuntu/backend
     tar xvzf artifact.tar.gz -C .
     ls -la
