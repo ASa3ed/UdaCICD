@@ -320,30 +320,45 @@ jobs:
       - revert-migrations
       - destroy-environment # Rollback on failure  
 
-  # smoke-test:
-  #   docker:
-  #     # Lightweight Docker image 
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Backend smoke test.
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Frontend smoke test.
-  #         command: |
-  #           # your code here
-  # 
-  #     - revert-migrations
-  #     - destroy-environment # Rollback on failure  
+  smoke-test:
+    docker:
+      - image: python:3.7-alpine3.11 
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip curl
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+                        --request GET https://api.memstash.io/values/IP)
+            URL="http://$BACKEND_IP:3030/api/status"
+            echo $URL
+            curl -s $URL
+      - run:
+          name: Backend smoke test.
+          command: |
+            echo "---------------"
+            echo $BACKEND_IP
+            echo "---------------"
+            URL="http://$BACKEND_IP:3030/api/status"
+            echo $URL
+            curl -s $URL
+      - run:
+          name: Frontend smoke test.
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID}.s3-website-us-west-2.amazonaws.com"
+            if curl -s ${URL} | grep "Welcome"
+            then
+              return 1
+            else
+              return 0
+            fi
+  
+      - revert-migrations
+      - destroy-environment # Rollback on failure  
 
   # cloudfront-update:
   #   docker:
@@ -404,9 +419,9 @@ workflows:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
-      - deploy-backend
+      # - deploy-backend:
           # requires: [run-migrations]
-      # - smoke-test:
+      - smoke-test
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
