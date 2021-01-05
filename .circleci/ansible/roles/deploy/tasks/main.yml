@@ -14,10 +14,10 @@
     production: yes
     state: present
 
-- name: Copy backend dist files web server
-  copy:
-    src: /root/project/backend
-    dest: /home/ubuntu
+# - name: Copy backend dist files web server
+#   copy:
+#     src: /root/project/backend
+#     dest: /home/ubuntu
 
 - name: Ensure Copying Done
   shell: |
