@@ -296,7 +296,7 @@ jobs:
       - attach_workspace:
           at: /tmp/.circleci/ansible
       - run: 
-          name: workaround
+          name: WorkAround for IP
           command: |
               cd  /tmp/.circleci/ansible
               echo [web] > inventory.txt
