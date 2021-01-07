@@ -410,32 +410,32 @@ jobs:
       - revert-migrations
       - destroy-environment # Rollback on failure 
 
-  cleanup:
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
-        - run:
-          name: Install dependencies
-          command: |
-            yum -y install tar gzip
-        - attach_workspace:
-            at: .circleci/ansible/
-        # - run:
-        #     name: Get old stack workflow id
-        #     command: |
-        #       # your code here
-        #       export OldWorkflowID="the id here"
-        #       export STACKS=[] #put the list of stacks here
-        # - run:
-        #     name: Remove old stacks and files
-        #     command: |
-        #       if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-        #       then
-        #         # your code here
-        #       fi
-        - revert-migrations
-        - destroy-environment # Rollback on failure 
+  # cleanup:
+  #     docker:
+  #       - image: amazon/aws-cli
+  #     steps:
+  #       - checkout
+  #       - run:
+  #         name: Install dependencies
+  #         command: |
+  #           yum -y install tar gzip
+  #       - attach_workspace:
+  #           at: .circleci/ansible/
+  #       # - run:
+  #       #     name: Get old stack workflow id
+  #       #     command: |
+  #       #       # your code here
+  #       #       export OldWorkflowID="the id here"
+  #       #       export STACKS=[] #put the list of stacks here
+  #       # - run:
+  #       #     name: Remove old stacks and files
+  #       #     command: |
+  #       #       if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+  #       #       then
+  #       #         # your code here
+  #       #       fi
+  #       - revert-migrations
+  #       - destroy-environment # Rollback on failure 
     
 
 workflows:
