@@ -340,14 +340,14 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update tar gzip curl
-      # - run:
-      #     name: Backend smoke test
-      #     command: |
-      #       BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
-      #                   --request GET https://api.memstash.io/values/IP)
-      #       URL="http://$BACKEND_IP:3030/api/status"
-      #       echo $URL
-      #       curl $URL
+      - run:
+          name: Backend smoke test
+          command: |
+            BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+                        --request GET https://api.memstash.io/values/IP)
+            URL="http://$BACKEND_IP:3030/api/status"
+            echo $URL
+            curl $URL
       - run:
           name: Frontend smoke test.
           command: |
@@ -362,40 +362,81 @@ jobs:
       - revert-migrations
       - destroy-environment # Rollback on failure  
 
-  # cloudfront-update:
-  #   docker:
-  #     # Docker image here that supports AWS CLI
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Update cloudfront distribution
-  #         command: |
-  #           # your code here
-  #     # Here's where you will add some code to rollback on failure  
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation list-exports \
+            --query "Exports[?Name=='WorkflowID'].Value" \
+            --no-paginate \
+            --output text > ./.circleci/ansible/originalWorkflowID.txt
 
-  # cleanup:
-  #     docker:
-  #       # Docker image here
-  #     steps:
-  #       # Checkout code from git
-  #       - run:
-  #           name: Get old stack workflow id
-  #           command: |
-  #             # your code here
-  #             export OldWorkflowID="the id here"
-  #             export STACKS=[] #put the list of stacks here
-  #       - run:
-  #           name: Remove old stacks and files
-  #           command: |
-  #             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-  #             then
-  #               # your code here
-  #             fi
-            
+            if [ -s "./.circleci/ansible/originalWorkflowID.txt" ]
+            then
+              cat ./.circleci/ansible/originalWorkflowID.txt
+              originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
+            else
+              echo "New stack will be created"
+            fi
+
+            if [ -n "$originalWorkflowID" ]
+            then
+              echo $originalWorkflowID
+              StackOption=update-stack
+              StackName=udapeople-$originalWorkflowID
+            else
+              StackOption=create-stack
+              StackName=udapeople-${CIRCLE_WORKFLOW_ID:0:7}
+            fi
+
+            aws cloudformation $StackOption \
+            --stack-name $StackName \
+            --template-body file://./.circleci/files/cloudfront.yml \
+            --parameter ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7} \
+            --tags Key=Name,Value=Udapeople-production-${CIRCLE_WORKFLOW_ID:0:7}
+      - persist_to_workspace:
+          root: .circleci/ansible/
+          paths:
+            - originalWorkflowID.txt
+
+      - revert-migrations
+      - destroy-environment # Rollback on failure 
+
+  cleanup:
+      docker:
+        - image: amazon/aws-cli
+      steps:
+        - checkout
+        - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip
+        - attach_workspace:
+            at: .circleci/ansible/
+        # - run:
+        #     name: Get old stack workflow id
+        #     command: |
+        #       # your code here
+        #       export OldWorkflowID="the id here"
+        #       export STACKS=[] #put the list of stacks here
+        # - run:
+        #     name: Remove old stacks and files
+        #     command: |
+        #       if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+        #       then
+        #         # your code here
+        #       fi
+        - revert-migrations
+        - destroy-environment # Rollback on failure 
+    
 
 workflows:
   default:
@@ -423,9 +464,9 @@ workflows:
       #     requires: [run-migrations]
       # - deploy-backend:
       #     requires: [run-migrations]
-      - smoke-test
+      # - smoke-test:
           # requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
+      - cloudfront-update
       #     requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
