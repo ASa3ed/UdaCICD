@@ -432,6 +432,8 @@ jobs:
       - run:
           name: Delete Old Stack
           command: |
+            pwd
+            ls -la
             originalWorkflowID=`cat originalWorkflowID.txt`
             echo $originalWorkflowID
             if [ -n "$originalWorkflowID" ]
