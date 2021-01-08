@@ -434,7 +434,7 @@ jobs:
           command: |
             pwd
             ls -la
-            ls .circleci/ansible/
+            ls /tmp/.circleci/ansible/
             originalWorkflowID=`cat originalWorkflowID.txt`
             echo $originalWorkflowID
             if [ -n "$originalWorkflowID" ]
