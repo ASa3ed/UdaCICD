@@ -187,8 +187,6 @@ jobs:
             ls ~/project/.circleci/ansible/
             cat ~/project/.circleci/ansible/inventory.txt
             yum -y install tar gzip jq npm
-
-            exit 1
       - persist_to_workspace:
           root: .circleci/ansible
           paths:
@@ -418,32 +416,33 @@ jobs:
       - revert-migrations
       - destroy-environment # Rollback on failure 
 
-  # cleanup:
-  #     docker:
-  #       - image: amazon/aws-cli
-  #     steps:
-  #       - checkout
-  #       - run:
-  #         name: Install dependencies
-  #         command: |
-  #           yum -y install tar gzip
-  #       - attach_workspace:
-  #           at: .circleci/ansible/
-  #       # - run:
-  #       #     name: Get old stack workflow id
-  #       #     command: |
-  #       #       # your code here
-  #       #       export OldWorkflowID="the id here"
-  #       #       export STACKS=[] #put the list of stacks here
-  #       # - run:
-  #       #     name: Remove old stacks and files
-  #       #     command: |
-  #       #       if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-  #       #       then
-  #       #         # your code here
-  #       #       fi
-  #       - revert-migrations
-  #       - destroy-environment # Rollback on failure 
+  cleanup:
+      docker:
+        - image: amazon/aws-cli
+      steps:
+        - checkout
+        - run:
+          name: Dependencies
+          command: |
+            yum -y install tar gzip
+        - attach_workspace:
+            at: .circleci/ansible/
+        - run:
+            name: Delete Old Stack
+            command: |
+              originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
+              echo $originalWorkflowID
+              if [ -n "$originalWorkflowID" ]
+              then
+                aws s3 rm s3://udapeople-$originalWorkflowID --recursive
+                aws s3 rb s3://udapeople-$originalWorkflowID --force
+                aws cloudformation delete-stack --stack-name udapeople-frontend-$originalWorkflowID
+                aws cloudformation delete-stack --stack-name udapeople-backend-$originalWorkflowID
+              else
+                echo "No old workflow exists"
+              fi 
+        - revert-migrations
+        - destroy-environment # Rollback on failure 
     
 
 workflows:
@@ -476,5 +475,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]
