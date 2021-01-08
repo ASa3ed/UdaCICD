@@ -380,7 +380,7 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
-            export OldWorkflowID=$(aws cloudformation list-exports \
+            export OriginalID=$(aws cloudformation list-exports \
             --query "Exports[?Name=='WorkflowID'].Value" \
             --no-paginate --output text)
 
@@ -389,8 +389,8 @@ jobs:
             --stack-status-filter CREATE_COMPLETE \
             --no-paginate --output text)
 
-            echo OldWorkflowID = 
-            echo "$OldWorkflowID"
+            echo OriginalID = 
+            echo "$OriginalID"
 
             echo STACKS = 
             echo "$STACKS"  
@@ -401,11 +401,11 @@ jobs:
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople &
 
-            # if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
+            # if [["${STACKS[@]} =~ "${OriginalID}"]]
             # then
-            #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-            #   aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
-            #   aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
+            #   aws s3 rm "s3://udapeople-${OriginalID}" --recursive
+            #   aws cloudformation delete-stack --stack-name "backend-$OriginalID"
+            #   aws cloudformation delete-stack --stack-name "frontend-$OriginalID"
             # fi
 
             curl -H "Content-Type: text/plain" -H "token: workflow-ID-b8dd46e1a6e2-8577-4f21-aa16-b8dd46-e1a6e2" \
