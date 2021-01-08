@@ -417,32 +417,32 @@ jobs:
       - destroy-environment # Rollback on failure 
 
   cleanup:
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
-        - run:
-          name: Dependencies
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+        name: Dependencies
+        command: |
+          yum -y install tar gzip
+      - attach_workspace:
+          at: .circleci/ansible/
+      - run:
+          name: Delete Old Stack
           command: |
-            yum -y install tar gzip
-        - attach_workspace:
-            at: .circleci/ansible/
-        - run:
-            name: Delete Old Stack
-            command: |
-              originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
-              echo $originalWorkflowID
-              if [ -n "$originalWorkflowID" ]
-              then
-                aws s3 rm s3://udapeople-$originalWorkflowID --recursive
-                aws s3 rb s3://udapeople-$originalWorkflowID --force
-                aws cloudformation delete-stack --stack-name udapeople-frontend-$originalWorkflowID
-                aws cloudformation delete-stack --stack-name udapeople-backend-$originalWorkflowID
-              else
-                echo "No old workflow exists"
-              fi 
-        - revert-migrations
-        - destroy-environment # Rollback on failure 
+            originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
+            echo $originalWorkflowID
+            if [ -n "$originalWorkflowID" ]
+            then
+              aws s3 rm s3://udapeople-$originalWorkflowID --recursive
+              aws s3 rb s3://udapeople-$originalWorkflowID --force
+              aws cloudformation delete-stack --stack-name udapeople-frontend-$originalWorkflowID
+              aws cloudformation delete-stack --stack-name udapeople-backend-$originalWorkflowID
+            else
+              echo "No old workflow exists"
+            fi 
+      - revert-migrations
+      - destroy-environment # Rollback on failure 
     
 
 workflows:
