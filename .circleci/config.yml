@@ -385,7 +385,6 @@ jobs:
             --no-paginate \
             --output text)
 
-          # save to memstash.io
             curl -H "Content-Type: text/plain" -H "token: workflow-ID-b8dd46e1a6e2-8577-4f21-aa16-b8dd46-e1a6e2" \
             --request PUT \
             --data "$OriginalID" https://api.memstash.io/values/Original-workflow-ID
