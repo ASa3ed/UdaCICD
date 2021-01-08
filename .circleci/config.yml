@@ -404,39 +404,13 @@ jobs:
             --stack-name udapeople-cloudfront \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople &
-
-            # if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
-            # then
-            #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-            #   aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
-            #   aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
-            # fi
-
-
-
-
-            # if [ -s $OriginalID ]
-            # then
-            #   cat ./.circleci/ansible/originalWorkflowID.txt
-            #   originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
-            # else
-            #   echo "New stack will be created"
-            # fi
-
-            # if [ -n "$OriginalID" ]
-            # then
-            #   StackOption=update-stack
-            #   StackName=udapeople-$OriginalID
-            # else
-            #   StackOption=create-stack
-            #   StackName=udapeople-${CIRCLE_WORKFLOW_ID:0:7}
-            # fi
-
-            # aws cloudformation $StackOption \
-            # --stack-name $StackName \
-            # --template-body file://./.circleci/files/cloudfront.yml \
-            # --parameter ParameterKey=WorkflowID,ParameterValue=${CIRCLE_WORKFLOW_ID:0:7} \
-            # --tags Key=Name,Value=Udapeople-production-${CIRCLE_WORKFLOW_ID:0:7}
+            
+            if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
+            then
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
+              aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
+            fi
       
             # sleep 240
       # - persist_to_workspace:
