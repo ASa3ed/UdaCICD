@@ -422,9 +422,9 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Dependencies
-        command: |
-          yum -y install tar gzip
+          name: Dependencies
+          command: |
+            yum -y install tar gzip
       - attach_workspace:
           at: .circleci/ansible/
       - run:
@@ -441,6 +441,7 @@ jobs:
             else
               echo "No old workflow exists"
             fi 
+
       - revert-migrations
       - destroy-environment # Rollback on failure 
     
