@@ -401,12 +401,12 @@ jobs:
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople &
 
-            if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
-            then
-              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
-              aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
-            fi
+            # if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
+            # then
+            #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+            #   aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
+            #   aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
+            # fi
 
             curl -H "Content-Type: text/plain" -H "token: workflow-ID-b8dd46e1a6e2-8577-4f21-aa16-b8dd46-e1a6e2" \
             --request PUT \
