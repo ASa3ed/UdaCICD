@@ -432,7 +432,7 @@ jobs:
       - run:
           name: Delete Old Stack
           command: |
-            originalWorkflowID=`cat ./.circleci/ansible/originalWorkflowID.txt`
+            originalWorkflowID=`cat originalWorkflowID.txt`
             echo $originalWorkflowID
             if [ -n "$originalWorkflowID" ]
             then
