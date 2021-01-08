@@ -390,7 +390,7 @@ jobs:
 
             echo OriginalID = "${OriginalID}"
 
-            
+
             
             # if [ -s $OriginalID ]
             # then
@@ -485,7 +485,7 @@ workflows:
       #     requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - cloudfront-update
+          # requires: [smoke-test]
       - cleanup
-          # requires: [cloudfront-update]
+          requires: [cloudfront-update]
