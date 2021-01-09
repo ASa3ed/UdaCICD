@@ -375,6 +375,7 @@ jobs:
             ls -la
             pwd 
             ls /
+            cd .circleci/ansible/
 
             export OldWorkflowID=$(aws cloudformation list-exports \
             --query "Exports[?Name=='WorkflowID'].Value" \
@@ -385,13 +386,9 @@ jobs:
             --stack-status-filter CREATE_COMPLETE \
             --no-paginate --output text)
 
-            cd .circleci/ansible/
-
             aws cloudformation list-exports \
             --query "Exports[?Name=='WorkflowID'].Value" \
             --no-paginate --output text > OldWorkflowID.txt
-
-            
 
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
@@ -448,6 +445,9 @@ jobs:
             OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
             echo OldWorkflowID: "$OldWorkflowID"
             cat /tmp/.circleci/ansible/OldWorkflowID.txt
+
+            out=$(grep "$OldWorkflowID" "${STACKS[@]}")
+            echo $out
 
             if [[ "${STACKS[@]}" =~ $OldWorkflowID ]]
             then
