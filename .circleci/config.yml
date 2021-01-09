@@ -370,7 +370,7 @@ jobs:
       - revert-migrations
       - destroy-environment # Rollback on failure  
 
-  cloudfront-update-and-cleanup:
+  cloudfront-update:
     docker:
       - image: amazon/aws-cli
     steps:
