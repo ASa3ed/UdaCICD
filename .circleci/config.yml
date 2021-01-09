@@ -378,7 +378,7 @@ jobs:
             cd .circleci/ansible/
 
             export OldWorkflowID=$(aws cloudformation list-exports \
-            --query "Exports[?Name=='WorkflowID'].Value" \
+            --query "Exports[?Name==\`WorkflowID\`].Value" \
             --no-paginate --output text)
             
             export STACKS=$(aws cloudformation list-stacks \
@@ -386,9 +386,9 @@ jobs:
             --stack-status-filter CREATE_COMPLETE \
             --no-paginate --output text)
 
-            aws cloudformation list-exports \
-            --query "Exports[?Name=='WorkflowID'].Value" \
-            --no-paginate --output text > OldWorkflowID.txt
+            # aws cloudformation list-exports \
+            # --query "Exports[?Name=='WorkflowID'].Value" \
+            # --no-paginate --output text > OldWorkflowID.txt
 
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
@@ -408,10 +408,11 @@ jobs:
 
             echo OldWorkflowID: "$OldWorkflowID"
 
-      - persist_to_workspace:
-          root: .circleci/ansible
-          paths:
-            - OldWorkflowID.txt
+      # - persist_to_workspace:
+      #     root: .circleci/ansible
+      #     paths:
+      #       - OldWorkflowID.txt
+
       # - revert-migrations
       # - destroy-environment # Rollback on failure  
 
@@ -446,7 +447,7 @@ jobs:
             # echo OldWorkflowID: "$OldWorkflowID"
             # cat /tmp/.circleci/ansible/OldWorkflowID.txt
 
-            if [[ ! echo "${STACKS[@]}" | grep -q "$OldWorkflowID" ]]  
+            if [[ ! echo "${STACKS[@]}" | grep -q $OldWorkflowID ]]  
             then
               echo "match"
             fi
@@ -496,7 +497,7 @@ workflows:
       #     requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update
+      - cloudfront-update
           # requires: [smoke-test]
-      - cleanup
-          # requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]
