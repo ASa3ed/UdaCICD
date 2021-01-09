@@ -402,13 +402,6 @@ jobs:
             --stack-name udapeople-cloudfront \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
-
-            # if [["${STACKS[@]} =~ "${OldWorkflowID}"]]
-            # then
-            #   aws s3 rm "s3://udapeople-id" --recursive
-            #   aws cloudformation delete-stack --stack-name "backend-$OldWorkflowID"
-            #   aws cloudformation delete-stack --stack-name "frontend-$OldWorkflowID"
-            # fi
             
             # sleep 240
       # - persist_to_workspace:
