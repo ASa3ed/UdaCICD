@@ -399,9 +399,9 @@ jobs:
 
             echo OldWorkflowID: "$OldWorkflowID"
       - persist_to_workspace:
-        root: .circleci/ansible
-        paths:
-          - OldWorkflowID.txt
+          root: .circleci/ansible
+          paths:
+            - OldWorkflowID.txt
       # - revert-migrations
       # - destroy-environment # Rollback on failure  
 
