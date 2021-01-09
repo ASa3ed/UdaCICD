@@ -372,6 +372,7 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
+            ls -la
             cd .circleci/ansible/
 
             export OldWorkflowID=$(aws cloudformation list-exports \
