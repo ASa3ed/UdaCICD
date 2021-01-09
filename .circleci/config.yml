@@ -424,8 +424,8 @@ jobs:
           name: Dependencies
           command: |
             yum -y install tar gzip
-      - attach_workspace:
-          at: /tmp/.circleci/ansible
+      # - attach_workspace:
+      #     at: /tmp/.circleci/ansible
       - run:
           name: Get & Delete Old Stacks
           command: |
@@ -442,10 +442,10 @@ jobs:
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
 
-            OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
-            echo OldWorkflowID: "$OldWorkflowID"
-            cat /tmp/.circleci/ansible/OldWorkflowID.txt
-            
+            # OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
+            # echo OldWorkflowID: "$OldWorkflowID"
+            # cat /tmp/.circleci/ansible/OldWorkflowID.txt
+
             if [[ ! echo "${STACKS[@]}" | grep -q "$OldWorkflowID" ]]  
             then
               echo "match"
