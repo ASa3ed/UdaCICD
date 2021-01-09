@@ -404,7 +404,7 @@ jobs:
             echo OldWorkflowID: "$OldWorkflowID"
 
             touch .circleci/ansible/OldWorkflowID.txt
-            
+
       - persist_to_workspace:
           root: .circleci/ansible
           paths:
@@ -441,6 +441,7 @@ jobs:
 
             OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
             echo OldWorkflowID: "$OldWorkflowID"
+            cat /tmp/.circleci/ansible/OldWorkflowID.txt
 
             if [[ "${STACKS[@]}" =~ $OldWorkflowID ]]
             then
