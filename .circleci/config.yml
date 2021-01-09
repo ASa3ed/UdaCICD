@@ -445,8 +445,8 @@ jobs:
             OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
             echo OldWorkflowID: "$OldWorkflowID"
             cat /tmp/.circleci/ansible/OldWorkflowID.txt
-
-            if [ ! echo "${STACKS[@]}" | grep -q "$OldWorkflowID" ]  
+            
+            if [[ ! echo "${STACKS[@]}" | grep -q "$OldWorkflowID" ]]  
             then
               echo "match"
             fi
@@ -496,7 +496,7 @@ workflows:
       #     requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update
+      # - cloudfront-update
           # requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      - cleanup
+          # requires: [cloudfront-update]
