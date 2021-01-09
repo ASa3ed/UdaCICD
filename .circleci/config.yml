@@ -7,21 +7,21 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
     steps:
-      # - run:
-      #     name: Install AWS CLI if not Exist
-      #     when: on_fail
-      #     command: |
-      #       if ! [ -x "$(command -v aws)" ]; then
-      #       pip install awscli
-      #       else
-      #       echo "AWS CLI already installed"
-      #       fi
+      - run:
+          name: Install AWS CLI if not Exist
+          when: on_fail
+          command: |
+            if ! [ -x "$(command -v aws)" ]; then
+            pip install awscli
+            else
+            echo "AWS CLI already installed"
+            fi
       - run:
           name: Destroy S3 Buckets
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-id --recursive
-            aws s3 rb s3://udapeople-id --force
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 rb s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --force
       - run:
           name: Destroy Stacks
           when: on_fail
@@ -157,14 +157,16 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udacity \
-              --stack-name backend-${CIRCLE_WORKFLOW_ID} 
+              --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udacity \
-              --stack-name frontend-${CIRCLE_WORKFLOW_ID} 
+              --stack-name frontend-${CIRCLE_WORKFLOW_ID} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -390,7 +392,6 @@ jobs:
             --no-paginate --output text)
 
             echo OldWorkflowID: "$OldWorkflowID"
-
             echo STACKS: "$STACKS"  
 
             curl -H "Content-Type: text/plain" -H "token: workflow-ID-b8dd46e1a6e2-8577-4f21-aa16-b8dd46-e1a6e2" \
@@ -458,22 +459,22 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      # - deploy-infrastructure:
-      #     # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [test-feature-branch] 
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update
-          # requires: [smoke-test]
+      - deploy-infrastructure:
+          # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [test-feature-branch] 
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
