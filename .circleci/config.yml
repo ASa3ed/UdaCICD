@@ -446,8 +446,11 @@ jobs:
             echo OldWorkflowID: "$OldWorkflowID"
             cat /tmp/.circleci/ansible/OldWorkflowID.txt
 
-            out=$(grep "$OldWorkflowID" "${STACKS[@]}")
-            echo $out
+            if [ ! echo "${STACKS[@]}" | grep -q "$OldWorkflowID" ]  
+            then
+              echo "match"
+            fi
+            
 
             if [[ "${STACKS[@]}" =~ $OldWorkflowID ]]
             then
