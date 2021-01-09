@@ -365,10 +365,6 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum -y install tar gzip
       - run:
           name: Update cloudfront distribution
           command: |
@@ -394,8 +390,8 @@ jobs:
             --request PUT \
             --data "$OldWorkflowID" https://api.memstash.io/values/OldWorkflowID
 
-      - revert-migrations
-      - destroy-environment # Rollback on failure  
+      # - revert-migrations
+      # - destroy-environment # Rollback on failure  
 
   cleanup:
     docker:
@@ -406,8 +402,6 @@ jobs:
           name: Dependencies
           command: |
             yum -y install tar gzip
-      - attach_workspace:
-          at: /tmp/.circleci/ansible/
       - run:
           name: Get & Delete Old Stacks
           command: |
@@ -422,7 +416,13 @@ jobs:
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
 
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            if [${OldWorkflowID}]
+            then
+              echo "I'm Right"
+            else
+              echo "I'm Wrong"
+
+            if [ "${STACKS[@]}" =~ *-${OldWorkflowID} ]
             then
               aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
               aws s3 rb s3://udapeople-${OldWorkflowID} --force
@@ -433,8 +433,8 @@ jobs:
               echo "Fresh New Stacks."
             fi
 
-      - revert-migrations
-      - destroy-environment # Rollback on failure 
+      # - revert-migrations
+      # - destroy-environment # Rollback on failure 
     
 
 workflows:
