@@ -372,6 +372,10 @@ jobs:
             --query "Exports[?Name=='WorkflowID'].Value" \
             --no-paginate --output text)
 
+            aws cloudformation list-exports \
+            --query "Exports[?Name=='WorkflowID'].Value" \
+            --no-paginate --output text > OldWorkflowID.txt
+
             export STACKS=$(aws cloudformation list-stacks \
             --query "StackSummaries[*].StackName" \
             --stack-status-filter CREATE_COMPLETE \
@@ -394,7 +398,10 @@ jobs:
                         --request GET https://api.memstash.io/values/OldWorkflowID)
 
             echo OldWorkflowID: "$OldWorkflowID"
-
+      - persist_to_workspace:
+        root: .circleci/ansible
+        paths:
+          - OldWorkflowID.txt
       # - revert-migrations
       # - destroy-environment # Rollback on failure  
 
@@ -407,11 +414,15 @@ jobs:
           name: Dependencies
           command: |
             yum -y install tar gzip
+      - attach_workspace:
+          at: /tmp/.circleci/ansible
       - run:
           name: Get & Delete Old Stacks
           command: |
             OldWorkflowID=$(curl -H "token: OldWorkflowID-${CIRCLE_WORKFLOW_ID}" \
                         --request GET https://api.memstash.io/values/OldWorkflowID)
+
+            
 
             export STACKS=$(aws cloudformation list-stacks \
             --query "StackSummaries[*].StackName" \
@@ -420,6 +431,9 @@ jobs:
 
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
+
+            OldWorkflowID=$(cat /tmp/.circleci/ansible/OldWorkflowID.txt)
+            echo OldWorkflowID: "$OldWorkflowID"
 
             if [[ "${STACKS[@]}" =~ $OldWorkflowID ]]
             then
