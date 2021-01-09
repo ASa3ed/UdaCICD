@@ -402,6 +402,9 @@ jobs:
                         --request GET https://api.memstash.io/values/OldWorkflowID)
 
             echo OldWorkflowID: "$OldWorkflowID"
+
+            touch .circleci/ansible/OldWorkflowID.txt
+            
       - persist_to_workspace:
           root: .circleci/ansible
           paths:
