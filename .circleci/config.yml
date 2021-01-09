@@ -32,7 +32,7 @@ commands:
           name: Destroy Promotion Stack
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-cloudfront
             
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.   
@@ -390,8 +390,8 @@ jobs:
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
 
-      # - revert-migrations
-      # - destroy-environment # Rollback on failure  
+      - revert-migrations
+      - destroy-environment # Rollback on failure  
 
   cleanup:
     docker:
@@ -407,7 +407,17 @@ jobs:
       - run:
           name: Get & Delete Old Stacks
           command: |
-            
+            export OldWorkflowID=$(aws cloudformation list-exports \
+            --query "Exports[?Name=='WorkflowID'].Value" \
+            --no-paginate --output text)
+
+            export STACKS=$(aws cloudformation list-stacks \
+            --query "StackSummaries[*].StackName" \
+            --stack-status-filter CREATE_COMPLETE \
+            --no-paginate --output text)
+
+            echo OldWorkflowID: "$OldWorkflowID"
+            echo STACKS: "$STACKS" 
 
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
@@ -420,8 +430,8 @@ jobs:
               echo "Fresh New Stacks."
             fi
 
-      # - revert-migrations
-      # - destroy-environment # Rollback on failure 
+      - revert-migrations
+      - destroy-environment # Rollback on failure 
     
 
 workflows:
