@@ -397,8 +397,8 @@ jobs:
             --data "$OldWorkflowID" https://api.memstash.io/values/OldWorkflowID
 
       
-      # - revert-migrations
-      # - destroy-environment # Rollback on failure  
+      - revert-migrations
+      - destroy-environment # Rollback on failure  
 
   cleanup:
     docker:
@@ -435,8 +435,8 @@ jobs:
               echo "Fresh New Stacks"
             fi
 
-      # - revert-migrations
-      # - destroy-environment # Rollback on failure 
+      - revert-migrations
+      - destroy-environment # Rollback on failure 
     
 
 workflows:
