@@ -423,9 +423,9 @@ jobs:
             echo OldWorkflowID: "$OldWorkflowID"
             echo STACKS: "$STACKS" 
             
-            if [[ "${STACKS[@]}" =~ $OldWorkflowID ]]
+            if [ ! -z $OldWorkflowID ]
             then
-              echo "I'm HERE !"
+              echo "I'm HERE !!!"
               aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
               aws s3 rb s3://udapeople-${OldWorkflowID} --force
               aws cloudformation delete-stack --stack-name backend-${OldWorkflowID}
