@@ -132,7 +132,8 @@ jobs:
             cd frontend
             sudo npm install npm@latest -g
             sudo npm i --save-dev standard-version
-            npm audit fix --force
+            npm audit
+            sudo npm audit fix --force
             npm audit 
             
   scan-backend:
@@ -148,7 +149,8 @@ jobs:
             cd backend
             sudo npm install npm@latest -g
             sudo npm i --save-dev standard-version
-            npm audit fix --force
+            npm audit
+            sudo npm audit fix --force
             npm audit 
             
   deploy-infrastructure:
