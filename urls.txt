@@ -1,6 +1,16 @@
-[URL01] https://github.com/ASa3ed/UdaCICD
-[URL02] 
-[URL03]
-[URL04]
-[URL05]
+[URL01] My repo 
+        https://github.com/ASa3ed/UdaCICD
+
+[URL02] S3 Bucket
+        http://udapeople-50edb27.s3-website-us-west-2.amazonaws.com
+
+[URL03] CloudFront distribution 
+       	d2w5ro3vimam89.cloudfront.net
+
+
+[URL04] back-end server in EC2
+        ec2-34-220-118-178.us-west-2.compute.amazonaws.com
+
+[URL05] Prometheus 
+        http://ec2-35-163-151-155.us-west-2.compute.amazonaws.com:9090/graph
 
