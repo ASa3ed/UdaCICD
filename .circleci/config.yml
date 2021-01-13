@@ -63,8 +63,8 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            npm install npm@latest -g
-            npm i --save-dev standard-version
+            sudo npm install npm@latest -g
+            sudo npm i --save-dev standard-version
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
@@ -81,8 +81,8 @@ jobs:
           name: Back-end build
           command: |
             cd backend
-            npm install npm@latest -g
-            npm i --save-dev standard-version
+            sudo npm install npm@latest -g
+            sudo npm i --save-dev standard-version
             npm run build
       - save_cache:
           paths: [backend/node_modules]
