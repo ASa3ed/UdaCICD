@@ -63,7 +63,7 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            npm install
+            npm install npm@latest -g
             npm i --save-dev standard-version
             npm run build
       - save_cache:
@@ -81,8 +81,8 @@ jobs:
           name: Back-end build
           command: |
             cd backend
+            npm install npm@latest -g
             npm i --save-dev standard-version
-            npm install
             npm run build
       - save_cache:
           paths: [backend/node_modules]
@@ -99,7 +99,7 @@ jobs:
           name: Front-end Test
           command: |
             cd frontend
-            npm install
+            npm install npm@latest -g
             npm i --save-dev standard-version
             npm install oauth-sign
             npm run test
@@ -115,7 +115,7 @@ jobs:
           name: Back-end Test
           command: |
             cd backend
-            npm install
+            npm install npm@latest -g
             npm i --save-dev standard-version
             npm run test
             
@@ -130,10 +130,10 @@ jobs:
           name: Front-end Scan
           command: |
             cd frontend
-            npm install
+            npm install npm@latest -g
             npm i --save-dev standard-version
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+            npm audit fix --force
+            npm audit 
             
   scan-backend:
     docker:
@@ -146,10 +146,10 @@ jobs:
           name: back-end Scan
           command: |
             cd backend
-            npm install
+            npm install npm@latest -g
             npm i --save-dev standard-version
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+            npm audit fix --force
+            npm audit 
             
   deploy-infrastructure:
     docker:
