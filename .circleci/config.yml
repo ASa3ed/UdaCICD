@@ -134,7 +134,7 @@ jobs:
           name: Front-end Scan
           command: |
             cd frontend
-            sudo npm install npm@latest -g
+            sudo npm install
             # sudo npm i --save-dev standard-version
             # sudo npm i semver 
             sudo npm audit fix --force
@@ -151,7 +151,7 @@ jobs:
           name: back-end Scan
           command: |
             cd backend
-            sudo npm install npm@latest -g
+            sudo npm install
             sudo npm audit fix --force
             sudo npm audit 
             
