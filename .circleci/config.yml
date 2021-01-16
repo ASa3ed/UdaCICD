@@ -64,8 +64,8 @@ jobs:
           command: |
             cd frontend
             sudo npm install npm@latest -g
-            sudo npm i --save-dev standard-version
-            sudo npm i semver
+            # sudo npm i --save-dev standard-version
+            # sudo npm i semver
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
@@ -83,9 +83,9 @@ jobs:
           command: |
             cd backend
             sudo npm install npm@latest -g
-            sudo npm i --save-dev standard-version
-            sudo npm i semver
-            npm run build
+            # sudo npm i --save-dev standard-version
+            # sudo npm i semver
+            sudo npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
