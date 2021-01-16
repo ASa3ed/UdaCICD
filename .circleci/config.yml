@@ -102,9 +102,9 @@ jobs:
           command: |
             cd frontend
             sudo npm install npm@latest -g
-            sudo npm i --save-dev standard-version
-            sudo npm install oauth-sign
-            sudo npm i semver
+            # sudo npm i --save-dev standard-version
+            # sudo npm install oauth-sign
+            # sudo npm i semver
             npm run test
                 
   test-backend:
@@ -119,8 +119,8 @@ jobs:
           command: |
             cd backend
             sudo npm install npm@latest -g
-            sudo npm i --save-dev standard-version
-            sudo npm i semver
+            # sudo npm i --save-dev standard-version
+            # sudo npm i semver
             npm run test
             
   scan-frontend:
@@ -135,9 +135,9 @@ jobs:
           command: |
             cd frontend
             sudo npm install npm@latest -g
-            sudo npm i --save-dev standard-version
-            sudo npm i semver 
-            sudo npm audit fix
+            # sudo npm i --save-dev standard-version
+            # sudo npm i semver 
+            sudo npm audit fix --force
             sudo npm audit 
             
   scan-backend:
@@ -151,8 +151,9 @@ jobs:
           name: back-end Scan
           command: |
             cd backend
-            sudo npm install
-            npm audit fix 
+            sudo npm install npm@latest -g
+            sudo npm audit fix --force
+            sudo npm audit 
             
   deploy-infrastructure:
     docker:
