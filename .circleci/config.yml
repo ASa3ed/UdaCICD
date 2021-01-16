@@ -186,7 +186,7 @@ jobs:
             
             echo "$ip" >> .circleci/ansible/inventory.txt
             echo "$ip"
-            curl -H "Content-Type: text/plain" -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+            curl -H "Content-Type: text/plain" -H "token: IP-${CIRCLE_WORKFLOW_ID:0:9}" \
             --request PUT \
             --data "$ip" https://api.memstash.io/values/IP
       - run:
@@ -293,7 +293,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+            BACKEND_IP=$(curl -H "token: IP-${CIRCLE_WORKFLOW_ID:0:9}" \
                         --request GET https://api.memstash.io/values/IP)
             export API_URL="http://${BACKEND_IP}:3030"
             echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
@@ -354,7 +354,7 @@ jobs:
       - run:
           name: Backend smoke test
           command: |
-            BACKEND_IP=$(curl -H "token: IP-10900a8f-8577-4f21-aa16-b8dd46e1a6e2" \
+            BACKEND_IP=$(curl -H "token: IP-${CIRCLE_WORKFLOW_ID:0:9}" \
                         --request GET https://api.memstash.io/values/IP)
             URL="http://$BACKEND_IP:3030/api/status"
             echo $URL
